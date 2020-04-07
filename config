@@ -40,8 +40,10 @@ exec --no-startup-id bash /home/fosky/.config/polybar/launch.sh
 exec --no-startup-id fcitx
 #exec --no-startup-id /home/bin/WizNote-x86_64.AppImage
 exec --no-startup-id bash /home/fosky/.config/i3/wallpaper.sh
+bindsym $mod+Control+P exec --no-startup-id bash /home/fosky/.config/i3/wallpaper.sh
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal -sh 40
+#bindsym $mod+Return exec i3-sensible-terminal -sh 40
+bindsym $mod+Return exec gnome-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -181,9 +183,6 @@ bindsym --release $mod+Shift+A exec scrot -bs -e 'mv $f ~/Pictures/snapshots/'
 
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-#exec --no-startup-id feh --bg-scale /home/fosky/图片/1920x1200.jpg
-
-bindsym $mod+Control+P exec --no-startup-id bash /home/fosky/.config/i3/wallpaper.sh
 
 set $mode_system  lock(L) logout(O) reboot(R) shutdown(S) exit(Esc)
 bindsym $mod+C mode "$mode_system"

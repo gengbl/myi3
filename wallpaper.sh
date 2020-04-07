@@ -3,5 +3,5 @@
 wpnames=(`ls ~/Pictures/wallpapers/*.jpg`)
 N=${#wpnames[@]}
 wp=$[RANDOM%$N+1]
-feh --bg-scale ${wpnames[$wp]}
+feh --bg-fill ${wpnames[$wp]}
 
