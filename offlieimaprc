@@ -1,0 +1,63 @@
+[general]
+metadata=~/.offlineimap
+accounts=qq
+maxsyncaccounts=3
+pythonfile = ~/.offlineimap.py
+ignore-readonly=n0
+
+
+[mbnames]
+enabled=no
+filename=~/mutt/muttrc.mailboxes
+header="mailboxes"
+
+peritem="+%(accountnames)s/%(foldername)s"
+sep=" "
+footer="\n"
+
+statuschar=
+
+[Account qq]
+localrepository=Local
+remoterepository=Remote
+#status_backend=sqlite
+
+[Account 126]
+localrepository=Local126
+remoterepository=Remote126
+#status_backend=sqlite
+
+[Repository Local126]
+type=Maildir
+localfolders=~/.mails126
+sep=.
+restoreatime=no
+
+[Repository Local]
+type=Maildir
+localfolders=~/.mails
+sep=.
+restoreatime=no
+
+
+[Repository Remote]
+type=IMAP
+ssl=yes
+remotehost=imap.exmail.qq.com
+remoteport=993
+thtunnel=ssh -q imaphost '/usr/bin/imapd ./Maildir'
+remoteuser=gengbeilei@ydrobot.com
+remotepass=wodemima1A
+realdelete=no
+sslcacertfile=/etc/ssl/certs/ca-certificates.crt
+
+[Repository Remote126]
+type=IMAP
+ssl=yes
+remotehost=imap.126.com
+remoteport=993
+thtunnel=ssh -q imaphost '/usr/bin/imapd ./Maildir'
+remoteuser=geng_bl@126.com
+remotepasseval=get_password_emacs("imap.126.com", "geng_bl@126.com", 993)
+realdelete=no
+sslcacertfile=/etc/ssl/certs/ca-certificates.crt
