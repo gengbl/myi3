@@ -31,10 +31,19 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     csv
-     html
+     python
+     gnus
+     mu4e
      javascript
+     yaml
+     lua
+     html
      markdown
+     (mu4e :variables
+           mu4e-installation-path "/usr/share/emacs/site-lisp/mu4e"
+           mu4e-enable-mode-line t
+           mu4e-enable-notifications t
+           mu4e-mu-binary (executable-find "/usr/bin/mu"))
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -45,8 +54,8 @@ values."
      ;; better-defaults
      emacs-lisp
      git
-     ;; markdown
-     ;;org
+     markdown
+     org
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -71,7 +80,8 @@ values."
    ;; `used-but-keep-unused' installs only the used packages but won't uninstall
    ;; them if they become unused. `all' installs *all* packages supported by
    ;; Spacemacs and never uninstall them. (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-only)
+  )
 
 (defun dotspacemacs/init ()
   "Initialization function.
@@ -297,6 +307,7 @@ values."
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
    ))
+
 (defun my-ident-config  (n)
   (setq c-basic-offset  n)
   (setq js2-basic-offset  n)
@@ -317,25 +328,87 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-   (setq configuration-layer--elpa-archives
-     '(("melpa-cn" ."http://elpa.emacs-china.org/melpa/")
-       ("org-cn"   ."http://elpa.emacs-china.org/org/")
-       ("gnu-cn"   ."http://elpa.emacs-china.org/gnu/")))
-   (my-ident-config 4)
-   (setq neo-vc-integration 'face)
-   (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
-   (setq org-capture-templates
-         '(("t" "Todo" entry (file+headline "~/.emacs.d/gtd.org" "工作安排")
-            "* TODO [#B] %?\n  %i\n"
-            :empty-lines 1)
-          ("i" "Idea" entry (file+headline "~/.emacs.d/gtd.org" "新的想法")
-            "* Idea [#B] %?\n  %i\n"
-            :empty-lines 1)
+ (setq configuration-layer--elpa-archives
+      '(("melpa-cn" . "http://elpa.emacs-china.org/melpa/")
+        ("org-cn"   . "http://elpa.emacs-china.org/org/")
+        ("gnu-cn"   . "http://elpa.emacs-china.org/gnu/")))
+
+    (my-ident-config 4)
+    (setq neo-vc-integration 'face)
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+;;; Set up some common mu4e variables
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;mail config
+
+    (setq mu4e-maildir "~/.mails"
+          mu4e-drafts-folder "/Drafts"
+          mu4e-sent-folder   "/Sent Messages"
+          mu4e-refile-folder "/Archive"
+          mu4e-trash-folder "/Deleted Messages"
+          mu4e-get-mail-command "mbsync -a"
+          mu4e-update-interval nil
+          mu4e-compose-signature-auto-include nil
+          mu4e-view-show-images t
+          mu4e-html2text-command 'mu4e-shr2text
+          shr-color-visible-luminance-min 80
+          mu4e-view-show-addresses t)
+     ;;; Mail directory shortcuts
+    ;(setq mu4e-maildir-shortcuts
+    ;        ("/Sent Messages" . ?s)
+    ;        ("/Junk" . ?j)
+    ;        ("/Deleted Messages" . ?d))
+
+    (setq mu4e-get-mail-command "offlineimap")
+    ;; something about ourselves
+    (setq user-mail-address "gengbeilei@ydrobot.com"
+          user-full-name  "gengbeilei"
+          mu4e-compose-signature
+          (concat
+           "耿蓓蕾\n"
+           "邮箱: gengbeilei@ydrobot.com\n"
+           "电话：15010177535"
+           )
+          mu4e-compose-signature-auto-include t
           )
-         )
-   ;; r aka remeber
-   (global-set-key (kbd "C-c r") 'org-capture)
-)
+    ;;send mail
+    (require 'smtpmail)
+    (setq message-send-mail-function 'smtpmail-send-it
+          smtpmail-stream-type 'starttls
+          smtpmail-default-smtp-server "smtp.exmail.qq.com"
+          smtpmail-smtp-server "smtp.exmail.qq.com"
+          smtpmail-smtp-service 587)
+
+    ;; save attachment to my desktop (this can also be a function)
+    (setq mu4e-attachment-dir "~/Downloads")
+
+    ;; sync email from imap server
+    (setq mu4e-get-mail-command "offlineimap"
+          mu4e-update-interval 300)
+    ;; notifcation
+    (setq mu4e-enable-notifications t)
+    (setq mu4e-alert-enable-mode-line-display t)
+    (setq mu4e-view-prefer-html t)
+    (with-eval-after-load 'mu4e-alert
+     ;; Enable Desktop notifications
+       (mu4e-alert-set-default-style 'notifications)) ; For linux
+      ;; (mu4e-alert-set-default-style 'libnotify))  ; Alternative for linux
+      ;; (mu4e-alert-set-default-style 'notifier))
+    ;; mail config end
+    ;; org
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+    (setq org-capture-templates
+          '(("t" "Todo" entry (file+headline "~/.emacs.d/gtd.org" "工作安排")
+             "* TODO [#B] %?\n  %i\n"
+             :empty-lines 1)
+            ("i" "Idea" entry (file+headline "~/.emacs.d/gtd.org" "新的想法")
+             "* Idea [#B] %?\n  %i\n"
+             :empty-lines 1)
+            )
+          )
+    ;; r aka remeber
+    ;; (global-set-key (kbd "C-c r") 'org-capture)
+  )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -355,7 +428,10 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (magit-gitflow json-mode js2-refactor livid-mode evil-magit web-mode web-beautify tagedit smeargle slim-mode skewer-mode scss-mode sass-mode pug-mode orgit mmm-mode markdown-toc markdown-mode magit-popup simple-httpd json-snatcher json-reformat multiple-cursors js2-mode js-doc helm-gitignore helm-css-scss helm-company helm-c-yasnippet haml-mode gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy magit git-commit with-editor transient emmet-mode disaster csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-c-headers company coffee-mode cmake-mode clang-format auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic mu4e-maildirs-extension mu4e-alert ht web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern dash-functional tern coffee-mode yaml-mode lua-mode web-mode tagedit slim-mode scss-mode sass-mode pug-mode helm-css-scss haml-mode emmet-mode company-web web-completion-data spinner mmm-mode goto-chg undo-tree adaptive-wrap powerline lv parent-mode projectile pkg-info epl flx highlight evil smartparens iedit anzu bind-map bind-key packed helm avy helm-core async popup f s dash smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download magit-gitflow magit-popup htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit git-commit with-editor transient company yasnippet auto-complete markdown-toc markdown-mode gh-md paradox evil-paredit ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio fuzzy flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump disaster diminish define-word company-statistics company-c-headers column-enforce-mode cmake-mode clean-aindent-mode clang-format auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent ace-window ace-link ace-jump-helm-line ac-ispell)))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(smtpmail-smtp-server "smtp.exmail.qq.com")
+ '(smtpmail-smtp-service 25))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
