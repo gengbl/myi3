@@ -35,6 +35,7 @@ floating_modifier $mod
 exec --no-startup-id compton -b 
 exec --no-startup-id xautolock -time 5 -locker "i3lock -c 335599"
 exec --no-startup-id nm-applet
+exec --no-startup-id blueman-applet
 exec --no-startup-id pnmixer
 exec --no-startup-id bash /home/fosky/.config/polybar/launch.sh 
 exec --no-startup-id fcitx
@@ -55,8 +56,10 @@ bindsym XF86AudioLowerVolume exec amixer set Master playback 5%-
 bindsym XF86AudioMute exec amixer set Master toggle
 # start dmenu (a program launcher)
 #bindsym $mod+d exec dmenu_run
-bindsym $mod+n exec rofi -show run
+bindsym $mod+n exec rofi -show drun
 bindsym $mod+m exec rofi -show window
+#bindsym $mod+Shift+n exec --no-startup-id "rofi -show drun -run-command 'gksudo {cmd}'"
+bindsym $mod+Shift+n exec --no-startup-id "SUDO_ASKPASS=~/.config/i3/askpass-rofi rofi -show drun -run-command 'sudo -A {cmd}'"
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 #
@@ -210,7 +213,7 @@ mode "$mode_system" {
 #    status_command i3status
 ##    i3bar_command i3bar --transparency
 #}
-bindsym $mod+control+o exec --no-startup-id xrandr --output HDMI-1-1 --same-as eDP-1-1 --auto
+bindsym $mod+control+o exec --no-startup-id xrandr --output HDMI-0 --same-as eDP-1-1 --auto
 #输入到HDMI1 使用1280x720分辨率，笔记本屏幕自动
 
 #bindsym $mod+Control+c exec --no-startup-id xrandr --output VGA --same-as LVDS --auto
@@ -219,7 +222,7 @@ bindsym $mod+control+o exec --no-startup-id xrandr --output HDMI-1-1 --same-as e
 bindsym $mod+control+v exec --no-startup-id xrandr --output VGA --same-as eDP-1-1 --auto
 #打开外接显示器(--auto)，与笔记本液晶屏幕显示同样内容（克隆）
 
-bindsym $mod+control+v+c xrandr --output HDMI-1-1 --right-of eDP-1-1 --auto
+bindsym $mod+control+v+c xrandr --output HDMI-0 --right-of eDP-1-1 --auto
 #打开外接显示器(–auto:最高分辨率)，设置为右侧扩展屏幕
 
 bindysm $mod+control+s exec --no-startup-id xrandr --output VGA --off
