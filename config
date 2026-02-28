@@ -4,16 +4,39 @@
 # Should you change your keyboard layout some time, delete
 # this file and re-run i3-config-wizard(1).
 #
-
 # i3 config file (v4)
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
+# 窗口的色彩方案
+#gaps bottom 40
 
+set $bgcolor    #666666
+set $in-bgcolor #363636
+set $text       #ffffff
+set $u-bgcolor  #ff0000
+set $indicator  #a8a3c1
+set $in-text    #969696
+#                       边框            背景            文本            指示器（显示下一个窗口位置的线条）     
+client.focused          $bgcolor        $bgcolor        $text           $indicator
+client.unfocused        $in-bgcolor     $in-bgcolor     $in-text        $in-bgcolor
+client.focused_inactive $in-bgcolor     $in-bgcolor     $in-text        $in-bgcolor
+client.urgent           $u-bgcolor      $u-bgcolor      $text           $u-bgcolor
+
+for_window [all] title_window_icon yes
 set $mod Mod4
+exec --no-startup-id xrandr --output HDMI-0 --primary --auto --pos 0x0 \
+         --output HDMI-1 --right-of HDMI-1-1 --auto
+
+exec --no-startup-id xrandr --output HDMI-0 --primary --auto --pos 0x0 --output HDMI-1-1 --right-of HDMI-0 --auto
+
+workspace 1 output HDMI-1-0
+workspace 2 output HDMI-1
+
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:monospace 8
+font pango:monospace 9
+workspace_layout tabbed
 
 new_window none
 #new_float none
@@ -31,20 +54,26 @@ new_window none
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
-
+exec --no-startup-id dbus-update-activation-environment --all
+#exec --no-startup-id gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
+exec_always --no-startup-id picom --backend xrender -b
+exec_always --no-startup-id killall gnome-keyring-daemon; gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
 exec --no-startup-id compton -b 
-exec --no-startup-id xautolock -time 5 -locker "i3lock -c 335599"
+#exec --no-startup-id xautolock -time 5 -locker "i3lock -c 335599"
 exec --no-startup-id nm-applet
 exec --no-startup-id blueman-applet
 exec --no-startup-id pnmixer
 exec --no-startup-id bash /home/fosky/.config/polybar/launch.sh 
-exec --no-startup-id fcitx
-#exec --no-startup-id /home/bin/WizNote-x86_64.AppImage
+#exec --no-startup-id wiznote
 exec --no-startup-id bash /home/fosky/.config/i3/wallpaper.sh
-bindsym $mod+Control+P exec --no-startup-id bash /home/fosky/.config/i3/wallpaper.sh
+exec --no-startup-id fcitx5 -d
+#exec --no-startup-id joplin-desktop
+exec --no-startup-id /home/fosky/local/Obsidian/obsidian
 # start a terminal
 #bindsym $mod+Return exec i3-sensible-terminal -sh 40
 bindsym $mod+Return exec gnome-terminal
+
+bindsym $mod+p exec --no-startup-id xrandr --output HDMI-0 --primary --auto --pos 0x0 --output HDMI-1-1 --right-of HDMI-0 --auto
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -64,7 +93,7 @@ bindsym $mod+Shift+n exec --no-startup-id "SUDO_ASKPASS=~/.config/i3/askpass-rof
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 #
 # installed.
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+#bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # change focus
 bindsym $mod+h focus left
@@ -150,6 +179,8 @@ bindsym $mod+shift+o exec "nemo --no-desktop"
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
+
+bindsym $mod+Ctrl+t exec --no-startup-id ~/.config/i3/i3-timer.sh
 # exit i3 (logs you out of your X session)
 
 # resize window (you can also use the mouse for that)
@@ -180,20 +211,24 @@ mode "resize" {
 bindsym $mod+R mode "resize"
 
 bindsym $mod+Control+l exec "i3lock -c 335599"
-bindsym --release $mod+Print exec scrot -e 'mv $f ~/Pictures/snapshots/'
-bindsym --release $mod+Shift+Print exec scrot -bs -e 'mv $f ~/Pictures/snapshots/'
-bindsym --release $mod+Shift+A exec scrot -bs -e 'mv $f ~/Pictures/snapshots/'
+bindsym --release $mod+Print exec scrot -e 'mv $f ~/Pictures/shots/'
+bindsym --release $mod+Shift+Print exec scrot -bs -e 'mv $f ~/Pictures/shots/'
+bindsym --release $mod+Shift+A exec scrot -bs -e 'mv $f ~/Pictures/shots/'
 
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
+#exec --no-startup-id feh --bg-scale /home/fosky/图片/1920x1200.jpg
 
-set $mode_system  lock(L) logout(O) reboot(R) shutdown(S) exit(Esc)
+bindsym $mod+Control+P exec --no-startup-id bash /home/fosky/.config/i3/wallpaper.sh
+
+set $mode_system  lock(L) logout(O) reboot(R) suspend(H) shutdown(S) exit(Esc)
 bindsym $mod+C mode "$mode_system"
 mode "$mode_system" {
             bindsym l exec --no-startup-id i3lock -c '#335599', mode "default"
             bindsym o exec --no-startup-id i3-msg exit, mode "default"
             bindsym r exec --no-startup-id systemctl reboot, mode "default"
             bindsym s exec --no-startup-id systemctl poweroff, mode "default"
+            bindsym h exec --no-startup-id systemctl suspend, mode "default"
             bindsym Escape mode "default"
 }
 
@@ -210,23 +245,33 @@ mode "$mode_system" {
 #        focused_workspace #00FF00 #193D0 #FFFF00
 #        urgent_workspace #FF0000 #FF0000 #FF0000
 #    }
-#    status_command i3status
-##    i3bar_command i3bar --transparency
 #}
-bindsym $mod+control+o exec --no-startup-id xrandr --output HDMI-0 --same-as eDP-1-1 --auto
+# in bar segment
+#    status_command i3status
+#    i3bar_command i3bar --transparency
+
+#bindsym $mod+control+o exec --no-startup-id xrandr --output DP1 --right-of eDP1 --auto
+#bindsym $mod+control+s exec --no-startup-id xrandr --output DP1 --off
+
+
+#bindsym $mod+control+t exec --no-startup-id bash /home/fosky/.config/polybar/launch.sh 
+
+#exec --no-startup-id xrandr --output HDMI1 --right-of eDP1 --auto
+#bindsym $mod+control+o exec --no-startup-id xrandr --output HDMI-0 --same-as eDP-1 --auto
 #输入到HDMI1 使用1280x720分辨率，笔记本屏幕自动
 
 #bindsym $mod+Control+c exec --no-startup-id xrandr --output VGA --same-as LVDS --auto
 #打开外接显示器(–auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）
 
-bindsym $mod+control+v exec --no-startup-id xrandr --output VGA --same-as eDP-1-1 --auto
+#bindsym $mod+control+v exec --no-startup-id xrandr --output VGA --same-as eDP-1 --auto
 #打开外接显示器(--auto)，与笔记本液晶屏幕显示同样内容（克隆）
 
-bindsym $mod+control+v+c xrandr --output HDMI-0 --right-of eDP-1-1 --auto
+#bindsym $mod+control+v+c xrandr --output HDMI-0 --right-of eDP-1 --auto
 #打开外接显示器(–auto:最高分辨率)，设置为右侧扩展屏幕
 
-bindysm $mod+control+s exec --no-startup-id xrandr --output VGA --off
+#bindysm $mod+control+s exec --no-startup-id xrandr --output VGA --off
 #关闭外接显示器
 
-bindysm $mod+control+s exec --no-startup-id xrandr --output VGA --off --output eDP-1-1 --auto  --output HDMI-1-1 --off
+#bindysm $mod+control+s exec --no-startup-id xrandr --output VGA --off --output eDP-1 --auto  --output HDMI-1-1 --off
 #关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）
+
