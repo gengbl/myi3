@@ -1,0 +1,157 @@
+; vim:ft=dosini
+[module/sep]
+type = custom/text
+content = "|"
+content-foreground = ${colors.disabled}
+content-padding = 0
+
+
+[module/wuqing-weather]
+type = custom/script
+exec = curl -s 'wttr.in/wuqing?format=1' | sed 's/\\xEF\\xB8\\x8F//g'
+interval = 60
+;click-left = cd ~/workspace/timelineshower/timelineserver && go run main.go &
+;click-right = pkill -f "go run main.go"
+format-background = ${colors.background}
+fomat-padding = 1
+
+[module/go-status]
+type = custom/script
+exec = ~/.config/polybar/scripts/status.sh
+interval = 5
+;click-left = cd ~/workspace/timelineshower/timelineserver && go run main.go &
+;click-right = pkill -f "go run main.go"
+format-background = ${colors.background}
+fomat-padding = 1
+
+[module/google-chrome]
+type = custom/text
+content = %{F#22FF00}%{F-}
+content-foreground = ${colors.primary}
+click-left = google-chrome-stable
+format-background = ${colors.background}
+fomat-padding = 1
+
+[module/firefox]
+type = custom/text
+content = %{F#ff9400}%{F-}
+content-foreground = ${colors.primary}
+click-left = firefox
+format-background = ${colors.background}
+fomat-padding = 1
+
+[module/applauncher]
+type = custom/text
+;;exec = ~/.config/polybar/scripts/at-task.sh
+content = %{F#ff9400}%{F-}
+;;interval = 5
+content-foreground = ${colors.primary}
+;click-left = ~/.config/rofi/launchers/type-6/launcher.sh
+click-left = ~/.config/polybar/scripts/application.sh
+format-background = ${colors.background}
+fomat-padding = 1
+
+
+[module/set-timer]
+type = custom/script
+exec = ~/.config/polybar/scripts/at-task.sh
+interval = 5
+click-left = ~/.config/i3/i3-timer.sh
+format-background = ${colors.background}
+fomat-padding = 1
+
+
+[module/cpu]
+type = internal/cpu
+interval = 1
+
+format = <ramp-load> <label>
+
+ramp-load-0 = 
+ramp-load-0-foreground = ${colors.success}
+
+ramp-load-1 = 
+ramp-load-1-foreground = ${colors.warning}
+
+ramp-load-2 = 
+ramp-load-2-foreground = ${colors.urgent}
+
+[module/show-desktop]
+type = custom/text
+
+content = 
+
+click-left = i3-msg workspace 25:Desktop
+
+[module/memory]
+type = internal/memory
+interval = 3
+
+format = <ramp-used> <label>
+
+label = %gb_used%/%gb_total%
+
+ramp-used-0 = 
+;ramp-used-0 = 󰍛
+ramp-used-0-foreground = ${colors.success}
+
+ramp-used-1 = 
+;ramp-used-1 = 󰍛
+ramp-used-1-foreground = ${colors.warning}
+
+ramp-used-2 = 
+;ramp-used-2 = 󰍛
+ramp-used-2-foreground = ${colors.urgent}
+
+
+[module/network-detail]
+type = internal/network
+interface = ${config.interface}
+interval = 3
+
+format-connected = <label-connected>
+
+label-connected =  %downspeed:9%   %upspeed:9%
+label-connected-foreground = ${colors.success}
+
+[module/temperature]
+type = internal/temperature
+
+thermal-zone = ${config.thermal-zone}
+
+base-temperature = ${config.base-temperature}
+
+warn-temperature = ${config.warn-temperature}
+
+; Format
+format = <ramp> <label>
+format-warn = <label-warn>
+format-warn-background = ${colors.foreground}
+
+label-warn =  %temperature-c%
+label-warn-padding = 1
+label-warn-foreground = ${colors.urgent}
+label-warn-background = ${colors.foreground}
+
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
+ramp-3 = 
+ramp-4 = 
+
+
+ramp-0-foreground = ${colors.nord8}
+ramp-1-foreground = ${colors.nord8}
+ramp-2-foreground = ${colors.success}
+ramp-3-foreground = ${colors.success}
+ramp-4-foreground = ${colors.warning}
+
+[module/systray]
+type = internal/tray
+; 这里的颜色直接用你刚才配好的半透背景色
+format-margin = 1pt
+tray-spacing = 1pt
+tray-size = 90%
+; 关键：在这里设置背景色，解决警告
+tray-background = ${colors.background}
+override-redirect = false
